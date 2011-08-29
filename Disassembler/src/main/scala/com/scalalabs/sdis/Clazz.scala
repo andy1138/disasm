@@ -1,3 +1,9 @@
+/**
+ * Disassembler
+ * (c)2011 andy hicks 
+ */
+
+
 package com.scalalabs.sdis
 import scala.reflect.NameTransformer
 

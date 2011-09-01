@@ -109,7 +109,7 @@ object ClazzReader {
 
     def loadAttributes(): List[AttributesInfo] = {
       val attrCount = raw.u2
-      println(">>loadAttributes: count: " + attrCount )
+//      println(">>loadAttributes: count: " + attrCount )
       List.tabulate(attrCount ) { _ => {
         loadAttribute()
       }
@@ -145,14 +145,21 @@ object ClazzReader {
 
       val attribute_name_index = b.u2
       val attribute_length = b.u4
-      println(">>loadCodeAttr: idx: " + attribute_name_index + " len" + attribute_length)
+//      pr
+      
+      
+//      intln(">>loadCodeAttr: idx: " + attribute_name_index + " len" + attribute_length)
 
       cpool(attribute_name_index - 1) match {
         case ConstantUtf8(_, "ConstantValue") => new ConstantValueAttribute(b.u2)  // ConstantValue (4.7.2)
         case ConstantUtf8(_, "Code") => loadCodeAttribute(attribute_length)   // Code (4.7.3), 
         // StackMapTable (4.7.4) 
         case ConstantUtf8(_, "Exceptions") => new ExceptionsAttribute(b.bytes(attribute_length))  // Exceptions (4.7.5),
-        case ConstantUtf8(_, "InnerClasses") => new InnerClassesAttribute(b.bytes(attribute_length))  // InnerClasses (4.7.6),
+        case ConstantUtf8(_, "InnerClasses") => // InnerClasses (4.7.6),
+            val inerClazz = List.tabulate(b.u2 ) { _ => {
+              new InnerClasses(b.u2, b.u2, b.u2, b.u2)
+            } } 
+            new InnerClassesAttribute(inerClazz)
         case ConstantUtf8(_, "EnclosingMethod") => new EnclosingMethodAttribute(b.u2, b.u2)  // EnclosingMethod (4.7.7), 
         case ConstantUtf8(_, "Synthetic") => new SyntheticAttribute()  // Synthetic (4.7.8),
         case ConstantUtf8(_, "Signature") => new SignatureAttribute(b.u2)  // Signature (4.7.9),
@@ -180,6 +187,7 @@ object ClazzReader {
 // SourceID (4.7.21)
 // CompilationID (4.7.22)
         case ConstantUtf8(_, "ScalaSig") =>  new ScalaSigAttribute(b.u1,b.u1, b.u1)  // ScalaSig
+        case ConstantUtf8(_, "Scala") =>  new ScalaAttribute(b.bytes(attribute_length))  // ScalaSig
 
         case ConstantUtf8(_, s) => new UnknownAttrib(s, b.bytes(attribute_length)) // Unknown
         case x => new UnknownAttrib("", b.bytes(attribute_length))

@@ -1,3 +1,9 @@
+/**
+ * Disassembler
+ * (c)2011 andy hicks 
+ */
+
+
 package com.scalalabs.sdis
 import scala.reflect.NameTransformer
 
@@ -94,7 +100,8 @@ case class CodeAttribute(max_stack:Short, max_locals:Short, code:Array[Byte], ex
 case class ExceptionsAttribute(info1: Array[Byte]) extends AttributesInfo
 
 // InnerClasses (4.7.6), 
-case class InnerClassesAttribute(info1: Array[Byte]) extends AttributesInfo
+case class InnerClasses(inner_class_info_index:Int, outer_class_info_index: Int, inner_name_index: Int, inner_class_access_flags:Int)
+case class InnerClassesAttribute(innClasses: List[InnerClasses]) extends AttributesInfo
 
 // EnclosingMethod (4.7.7), 
 case class EnclosingMethodAttribute(class_index:Int, method_index: Int ) extends AttributesInfo
@@ -152,6 +159,7 @@ case class RuntimeInvisibleAnnotationsAttribute(annotations:List[RVAnnonItem] ) 
 
 
 case class ScalaSigAttribute(major: Int, minor: Int, entries: Int) extends AttributesInfo
+case class ScalaAttribute(info: Array[Byte]) extends AttributesInfo
 
 
 case class UnknownAttrib(name: String, info1: Array[Byte]) extends AttributesInfo
